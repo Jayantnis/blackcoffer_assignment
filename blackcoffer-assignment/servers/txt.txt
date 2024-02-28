@@ -1,0 +1,3 @@
+schema - define the strc
+schema - model
+using this model crud opt.
