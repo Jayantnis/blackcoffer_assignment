@@ -1,64 +1,65 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import * as echarts from 'echarts';
 
-const EChartsComponent = () => {
-  const [data, setData] = useState([]);
-
+const MyChartComponent = ({ data }) => {
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://localhost:8085/api/data');
-        const jsonData = await response.json();
-        setData(jsonData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+    // Initialize echarts instance
+    const myChart = echarts.init(document.getElementById('main'));
 
-    fetchData();
-  }, []);
+    // Extracting intensity and start_year from data
+    const intensityData = data.map(item => item.intensity);
+    const years = data.map(item => item.start_year);
 
-  useEffect(() => {
-    // Process data and render chart when data changes
-    if (data.length > 0) {
-      renderChart();
-    }
-  }, [data]);
+    // Generating series data dynamically
+    const seriesData = data.map(item => ({
+      name: item.topic,
+      type: 'line',
+      stack: 'Total',
+      data: intensityData
+    }));
 
-  const renderChart = () => {
-    const chartDom = document.getElementById('main');
-    const myChart = echarts.init(chartDom);
-
-    const option = {
+    // Specify options and set them using setOption
+    const options = {
       title: {
-        text: 'E Chart'
+        text: 'Intensity Over Time'
       },
       tooltip: {
         trigger: 'axis'
       },
       legend: {
-        data: data.map(item => item.topic)
+        data: data.map(item => item.topic) // Use topics as legend data
+      },
+      grid: {
+        left: '3%',
+        right: '3%',
+        bottom: '3%',
+        containLabel: true
+      },
+      toolbox: {
+        feature: {
+          saveAsImage: {}
+        }
       },
       xAxis: {
         type: 'category',
-        data: data.map(item => item.country)
+        boundaryGap: false,
+        data: years // Use years as xAxis data
       },
       yAxis: {
         type: 'value'
       },
-      series: data.map(item => ({
-        name: item.topic,
-        type: 'bar',
-        data: [item.intensity]
-      }))
+      series: seriesData // Use dynamically generated series data
     };
 
-    myChart.setOption(option);
-  };
+    myChart.setOption(options);
 
-  return (
-    <div id="main" style={{ width: '100%', height: '400px' }}></div>
-  );
+    // Clean up on unmount
+    return () => {
+      myChart.dispose();
+    };
+  }, [data]); // Run useEffect whenever data prop changes
+
+  return <div id="main" style={{ width: '100%', height: '400px' }} />;
 };
 
-export default EChartsComponent;
+export default MyChartComponent;

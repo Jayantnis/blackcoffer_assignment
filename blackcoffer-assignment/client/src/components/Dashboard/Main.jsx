@@ -11,8 +11,7 @@ import TopicsRadarChart from "./TopicChart";
 import PieChart from "./SectorChart";
 import CountryChart from "./Country";
 import LikelihoodRadarChart from "./LikelihoodChart";
-import  EChartsComponent  from "./EChartsComponent";
-
+import EChartsComponent from "./EChartsComponent";
 Chart.register(CategoryScale);
 
 const Main = () => {
@@ -34,11 +33,13 @@ const Main = () => {
   return (
 
     <ChakraProvider>
+
       <Navbar />
-      <div className="mt-10 p-2">
-        <IntensityChart data={data} />
-        {/* <EChartsComponent data={data} /> */}
+      <div className=" col-xl-12 pt-10">
+
+
         <Flex direction={{ base: "column", md: "row" }} m={50}>
+
           <Box
             flex={{ base: "1", md: "0.5" }}
             maxW="50%"
@@ -61,7 +62,14 @@ const Main = () => {
           </Box>
         </Flex>
         <RelevanceBubbleChart data={data} />
-        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={4}>
+        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6}>
+          <Box>
+            <IntensityChart data={data} />
+          </Box>
+          <Box>
+            <EChartsComponent data={data} />
+          </Box>
+
           <Box>
             <PieChart data={data} />
           </Box>
@@ -70,8 +78,6 @@ const Main = () => {
           </Box>
         </Grid>
         <CountryChart data={data} />
-
-
       </div>
     </ChakraProvider>
   );

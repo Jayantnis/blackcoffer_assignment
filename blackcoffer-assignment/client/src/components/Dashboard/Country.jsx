@@ -16,9 +16,19 @@ const CountryChart = ({ data }) => {
   );
   const [chartData, setChartData] = useState(null);
 
+  const [selectedRegion, setSelectedRegion] = useState("India"); // State for selected region
+  const [regionOptions, setRegionOptions] = useState([]); // State for region options
+
   useEffect(() => {
     const countryData = data.filter(
       (entry) => entry.country === selectedCountry
+    );
+    const regions = [...new Set(data.map(item => item.region))];
+    setRegionOptions(regions);
+
+
+    const countryRegions = data.filter(
+      (entry) => entry.region === selectedRegion
     );
 
     const sectors = {};
@@ -33,6 +43,15 @@ const CountryChart = ({ data }) => {
     const sectorIntensities = sectorLabels.map(
       (sector) => sectors[sector]
     );
+
+
+    countryRegions.forEach((entry) => {
+      if (!sectors[entry.sector]) {
+        sectors[entry.sector] = [];
+      }
+      sectors[entry.sector].push(entry.intensity);
+    });
+
 
     const chartBackgroundColor =
       colorMode === "light"
@@ -49,7 +68,7 @@ const CountryChart = ({ data }) => {
         },
       ],
     });
-  }, [selectedCountry, data, colorMode]);
+  }, [selectedCountry, selectedRegion, data, colorMode]);
 
   const chartOptions = {
     responsive: true,
@@ -69,6 +88,9 @@ const CountryChart = ({ data }) => {
 
   const handleCountryChange = (event) => {
     setSelectedCountry(event.target.value);
+  };
+  const handleRegionChange = (event) => {
+    setSelectedRegion(event.target.value); // Update selected region
   };
 
   return (
@@ -93,7 +115,23 @@ const CountryChart = ({ data }) => {
           <option value="Russia">Russia</option>
           <option value="Saudi Arabia">Saudi Arabia</option>
         </Select>
-        <Box height="500px" width={"100%"}>
+        <Heading as={"h2"} textAlign="left" mb={4} style={{ textAlign: "left" }} >
+          Region Chart
+        </Heading>
+        <Select
+          value={selectedRegion}
+          onChange={handleRegionChange}
+          mb={4}
+          w="200px"
+          colorScheme="purple"
+        >
+          {regionOptions.map((region) => (
+            <option key={region} value={region}>
+              {region}
+            </option>
+          ))}
+        </Select>
+        <Box height="500px" width={"100%"} overflowX="auto">
           {chartData && <Bar data={chartData} options={chartOptions} />}
         </Box>
       </Flex>
